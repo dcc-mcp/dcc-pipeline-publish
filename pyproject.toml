@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dcc-pipeline-publish"
+version = "0.1.0"
+description = "Portable publish manifests for DCC-MCP production workflows"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
