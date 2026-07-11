@@ -3,7 +3,7 @@
 A small, portable publish-manifest contract connecting DCC exports, OpenUSD
 validation, render-farm jobs, and Autodesk Flow Production Tracking.
 
-![Production publish workflow](docs/publish-workflow.png)
+![DCC exports validated, rendered on a farm, and recorded as published versions](docs/images/dcc-pipeline-publish-showcase.webp)
 
 ## Why a manifest
 
