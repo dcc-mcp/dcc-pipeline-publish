@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dcc-pipeline-publish"
 version = "0.1.0"
-description = "Portable publish manifests for DCC-MCP production workflows"
+description = "Portable release and publish skills for DCC-MCP production workflows"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 
