@@ -1,7 +1,12 @@
 # dcc-pipeline-publish
 
-A small, portable publish-manifest contract connecting DCC exports, OpenUSD
-validation, render-farm jobs, and Autodesk Flow Production Tracking.
+Portable release and publish skills for DCC-MCP production workflows.
+
+The repository currently owns two engine-neutral contracts:
+
+- `pipeline-publish` records verified DCC exports for downstream production systems.
+- `game-release-package` turns an already exported Windows game into an installer,
+  SteamPipe preview configuration, or WeGame submission preflight.
 
 ![DCC exports validated, rendered on a farm, and recorded as published versions](docs/images/dcc-pipeline-publish-showcase.webp)
 
@@ -22,4 +27,13 @@ flowchart LR
 
 See [`references/WORKFLOW.md`](skill/pipeline-publish/references/WORKFLOW.md)
 for the agent orchestration recipe.
+
+## Game releases
+
+Game engines remain responsible for building playable content. After Unreal,
+Unity, or Godot exports a complete Windows directory, `game-release-package`
+handles the distribution-specific handoff without importing an engine SDK.
+
+See the [game release workflow](skill/game-release-package/references/WORKFLOW.md)
+for prerequisites, profile behavior, and safety boundaries.
 
