@@ -2,13 +2,15 @@
 
 Portable release and publish skills for DCC-MCP production workflows.
 
-The repository currently owns three engine-neutral contracts:
+The repository currently owns four engine-neutral contracts:
 
 - `pipeline-publish` records verified DCC exports for downstream production systems.
 - `game-release-package` turns an already exported Windows game into an installer,
   SteamPipe preview configuration, or WeGame submission preflight.
 - `game-runtime-acceptance` launches or validates a prebuilt game against
   structured milestones, performance thresholds, and hash-bearing evidence.
+- `game-pv-capture` plans and preserves exact-window, hash-verified gameplay
+  shots before HyperFrames editing.
 
 ![DCC exports validated, rendered on a farm, and recorded as published versions](docs/images/dcc-pipeline-publish-showcase.webp)
 
@@ -42,4 +44,8 @@ for prerequisites, profile behavior, and safety boundaries.
 Runtime acceptance remains a separate gate. See the
 [game runtime workflow](skill/game-runtime-acceptance/references/WORKFLOW.md) for
 bounded launch behavior, structured event rules, and evidence ownership.
+
+Gameplay capture remains separate from runtime acceptance and editing. See the
+[game PV capture workflow](skill/game-pv-capture/references/WORKFLOW.md) for
+multi-instance routing, exact-window recording, and frame evidence rules.
 
