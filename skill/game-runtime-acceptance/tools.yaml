@@ -1,0 +1,153 @@
+tools:
+  - name: run_game_runtime_acceptance
+    description: >-
+      Launch one exact prebuilt Windows game executable without a shell, wait
+      for a structured completion event, enforce milestone and performance
+      rules, and write hash-bearing evidence outside the build directory.
+    source_file: scripts/run_game_runtime_acceptance.py
+    execution: async
+    affinity: any
+    timeout_hint_secs: 7200
+    enforce_thread_affinity: true
+    annotations:
+      read_only_hint: false
+      destructive_hint: false
+      idempotent_hint: false
+      open_world_hint: true
+    input_schema:
+      type: object
+      required: [request_id, source_directory, executable_relative_path, evidence_directory, engine, completion_event]
+      additionalProperties: false
+      properties:
+        request_id:
+          type: string
+          pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+        source_directory: {type: string, minLength: 1}
+        executable_relative_path: {type: string, minLength: 1, maxLength: 512}
+        evidence_directory: {type: string, minLength: 1}
+        engine: {type: string, enum: [unity, unreal, godot, custom_stdout]}
+        arguments:
+          type: array
+          maxItems: 64
+          default: []
+          items: {type: string, maxLength: 1024}
+        timeout_seconds: {type: integer, minimum: 1, maximum: 7200, default: 600}
+        event_prefix: {type: string, maxLength: 128, default: ""}
+        completion_event: {$ref: '#/$defs/event_rule'}
+        required_events:
+          type: array
+          maxItems: 128
+          default: []
+          items: {$ref: '#/$defs/event_rule'}
+        metrics:
+          type: array
+          maxItems: 64
+          default: []
+          items: {$ref: '#/$defs/metric_rule'}
+        required_markers:
+          type: array
+          maxItems: 64
+          default: []
+          items: {type: string, minLength: 1, maxLength: 512}
+        forbidden_markers:
+          type: array
+          maxItems: 64
+          default: []
+          items: {type: string, minLength: 1, maxLength: 512}
+        leave_running_on_success: {type: boolean, default: true}
+      $defs:
+        event_rule:
+          type: object
+          required: [event]
+          additionalProperties: false
+          properties:
+            event: {type: string, minLength: 1, maxLength: 128}
+            min_count: {type: integer, minimum: 0, maximum: 1000000, default: 1}
+            max_count: {type: integer, minimum: 0, maximum: 1000000}
+            fields:
+              type: object
+              maxProperties: 16
+              additionalProperties: {type: [string, number, integer, boolean]}
+        metric_rule:
+          type: object
+          required: [event, field]
+          additionalProperties: false
+          properties:
+            event: {type: string, minLength: 1, maxLength: 128}
+            field: {type: string, minLength: 1, maxLength: 64}
+            minimum: {type: number}
+            maximum: {type: number}
+            min_samples: {type: integer, minimum: 1, maximum: 1000000, default: 1}
+    output_schema: {type: object}
+    next-tools:
+      on-success: [ui_control__snapshot]
+      on-failure: [dcc_diagnostics__audit_log]
+
+  - name: validate_game_runtime_log
+    description: >-
+      Read one bounded existing runtime log and evaluate the same structured
+      completion, milestone, marker, and numeric metric contract without
+      launching or controlling an application.
+    source_file: scripts/validate_game_runtime_log.py
+    execution: sync
+    affinity: any
+    timeout_hint_secs: 120
+    enforce_thread_affinity: true
+    annotations:
+      read_only_hint: true
+      destructive_hint: false
+      idempotent_hint: true
+      open_world_hint: false
+    input_schema:
+      type: object
+      required: [log_path, completion_event]
+      additionalProperties: false
+      properties:
+        log_path: {type: string, minLength: 1}
+        executable_path: {type: string, default: ""}
+        event_prefix: {type: string, maxLength: 128, default: ""}
+        completion_event: {$ref: '#/$defs/event_rule'}
+        required_events:
+          type: array
+          maxItems: 128
+          default: []
+          items: {$ref: '#/$defs/event_rule'}
+        metrics:
+          type: array
+          maxItems: 64
+          default: []
+          items: {$ref: '#/$defs/metric_rule'}
+        required_markers:
+          type: array
+          maxItems: 64
+          default: []
+          items: {type: string, minLength: 1, maxLength: 512}
+        forbidden_markers:
+          type: array
+          maxItems: 64
+          default: []
+          items: {type: string, minLength: 1, maxLength: 512}
+      $defs:
+        event_rule:
+          type: object
+          required: [event]
+          additionalProperties: false
+          properties:
+            event: {type: string, minLength: 1, maxLength: 128}
+            min_count: {type: integer, minimum: 0, maximum: 1000000, default: 1}
+            max_count: {type: integer, minimum: 0, maximum: 1000000}
+            fields:
+              type: object
+              maxProperties: 16
+              additionalProperties: {type: [string, number, integer, boolean]}
+        metric_rule:
+          type: object
+          required: [event, field]
+          additionalProperties: false
+          properties:
+            event: {type: string, minLength: 1, maxLength: 128}
+            field: {type: string, minLength: 1, maxLength: 64}
+            minimum: {type: number}
+            maximum: {type: number}
+            min_samples: {type: integer, minimum: 1, maximum: 1000000, default: 1}
+    output_schema: {type: object}
