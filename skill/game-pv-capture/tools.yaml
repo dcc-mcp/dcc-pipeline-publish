@@ -1,0 +1,85 @@
+tools:
+  - name: create_game_pv_capture_plan
+    description: >-
+      Create a deterministic request-scoped shot plan that preserves the DCC
+      instance route, logical UI Control session, exact PID/HWND, bounded clip
+      settings, and canonical ui_control__record_clip arguments.
+    source_file: scripts/create_game_pv_capture_plan.py
+    execution: sync
+    affinity: any
+    timeout_hint_secs: 60
+    enforce_thread_affinity: true
+    annotations:
+      read_only_hint: false
+      destructive_hint: false
+      idempotent_hint: true
+      open_world_hint: false
+    input_schema:
+      type: object
+      required: [request_id, evidence_directory, instance_id, session_id, process_id, window_handle, shots]
+      additionalProperties: false
+      properties:
+        request_id:
+          type: string
+          pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+        evidence_directory: {type: string, minLength: 1}
+        instance_id: {type: string, minLength: 1, maxLength: 128}
+        session_id: {type: string, minLength: 1, maxLength: 128}
+        process_id: {type: integer, minimum: 1}
+        window_handle: {type: integer, minimum: 1}
+        shots:
+          type: array
+          minItems: 1
+          maxItems: 16
+          items:
+            type: object
+            required: [shot_id, purpose, duration_ms]
+            additionalProperties: false
+            properties:
+              shot_id: {type: string, pattern: '^[a-z0-9][a-z0-9-]{0,63}$'}
+              purpose: {type: string, enum: [gameplay, upgrade, boss, victory, title, custom]}
+              duration_ms: {type: integer, minimum: 1000, maximum: 180000}
+              frames_per_second: {type: integer, minimum: 1, maximum: 60, default: 30}
+              jpeg_quality: {type: integer, minimum: 70, maximum: 100, default: 92}
+              minimum_unique_frames: {type: integer, minimum: 1, maximum: 10800}
+    output_schema: {type: object}
+    next-tools:
+      on-success: [ui_control__record_clip]
+      on-failure: [dcc_diagnostics__audit_log]
+
+  - name: finalize_game_pv_capture
+    description: >-
+      Verify every Core exact-window clip against the planned route, PID/HWND,
+      encoding, frame count, JPEG structure, monotonic timestamps, per-frame
+      SHA-256, and minimum motion evidence, then atomically preserve the shots
+      as HyperFrames-ready JPEG sequences.
+    source_file: scripts/finalize_game_pv_capture.py
+    execution: async
+    affinity: any
+    timeout_hint_secs: 900
+    enforce_thread_affinity: true
+    annotations:
+      read_only_hint: false
+      destructive_hint: false
+      idempotent_hint: true
+      open_world_hint: false
+    input_schema:
+      type: object
+      required: [plan_path, captured_shots]
+      additionalProperties: false
+      properties:
+        plan_path: {type: string, minLength: 1}
+        captured_shots:
+          type: array
+          minItems: 1
+          maxItems: 16
+          items:
+            type: object
+            required: [shot_id, manifest_path]
+            additionalProperties: false
+            properties:
+              shot_id: {type: string, pattern: '^[a-z0-9][a-z0-9-]{0,63}$'}
+              manifest_path: {type: string, minLength: 1}
+    output_schema: {type: object}
+    next-tools:
+      on-failure: [dcc_diagnostics__audit_log]
