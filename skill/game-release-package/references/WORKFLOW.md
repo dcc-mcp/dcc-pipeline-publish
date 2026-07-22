@@ -7,6 +7,13 @@
 3. Call `package_prebuilt_game_release` on the exported directory.
 4. Verify the returned artifacts in the target platform's test environment.
 
+Before step 3, make an explicit licensing declaration. Choose `original_only`
+only if the complete shipped directory has no third-party content. Otherwise
+place a non-empty `THIRD-PARTY-NOTICES.txt` or `.md` inside the exported
+directory and use `third_party_notices`. Retain the returned
+`license-provenance.json`; it binds that notices file and the executable by
+SHA-256 for the release handoff.
+
 This skill deliberately does not open an editor, compile scripts, cook assets,
 or publish to an authenticated store account.
 
@@ -35,5 +42,6 @@ authenticated portal submission remain external steps.
 
 - `output_directory` must not be inside `source_directory`.
 - `executable_relative_path` cannot escape the source directory.
+- Third-party notices must stay inside the source directory and are limited to 2 MiB.
 - The tool never launches the game, uploads content, or stores credentials.
 - Code signing is a separate release gate and should use protected credentials.

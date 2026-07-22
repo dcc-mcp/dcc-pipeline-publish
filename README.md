@@ -36,7 +36,9 @@ for the agent orchestration recipe.
 
 Game engines remain responsible for building playable content. After Unreal,
 Unity, or Godot exports a complete Windows directory, `game-release-package`
-handles the distribution-specific handoff without importing an engine SDK.
+handles the distribution-specific handoff without importing an engine SDK. It
+also requires an explicit original-only or third-party-notices declaration and
+emits hash-bound license provenance for the handoff.
 
 See the [game release workflow](skill/game-release-package/references/WORKFLOW.md)
 for prerequisites, profile behavior, and safety boundaries.

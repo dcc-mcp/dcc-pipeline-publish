@@ -17,7 +17,7 @@ tools:
       open_world_hint: false
     input_schema:
       type: object
-      required: [source_directory, executable_relative_path, output_directory, release_profile]
+      required: [source_directory, executable_relative_path, output_directory, release_profile, content_license_mode]
       properties:
         source_directory:
           type: string
@@ -34,6 +34,14 @@ tools:
         release_profile:
           type: string
           enum: [installer, steam, wegame]
+        content_license_mode:
+          type: string
+          enum: [original_only, third_party_notices]
+          description: Explicit release declaration. Use third_party_notices when any shipped content is third-party.
+        third_party_notices_relative_path:
+          type: string
+          default: ""
+          description: Required in third_party_notices mode; a non-empty .txt or .md file inside source_directory.
         product_name:
           type: string
           default: ""
@@ -71,6 +79,7 @@ tools:
           executable_relative_path: "MyGame.exe"
           output_directory: "D:/Releases/MyGame-Installer"
           release_profile: installer
+          content_license_mode: original_only
           product_name: My Game
           product_version: 1.0.0
         note: Create a standalone Windows Setup executable from any supported engine export.
@@ -79,6 +88,8 @@ tools:
           executable_relative_path: "MyGame.exe"
           output_directory: "D:/Releases/MyGame-Steam"
           release_profile: steam
+          content_license_mode: third_party_notices
+          third_party_notices_relative_path: THIRD-PARTY-NOTICES.txt
           steam_app_id: "123456"
           steam_depot_id: "123457"
         note: Create preview-only SteamPipe scripts without uploading content.

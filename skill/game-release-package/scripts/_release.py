@@ -14,6 +14,8 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
 
 PROFILES = {"installer", "steam", "wegame"}
+CONTENT_LICENSE_MODES = {"original_only", "third_party_notices"}
+MAX_NOTICES_BYTES = 2 * 1024 * 1024
 
 
 def _sha256(path: Path) -> str:
@@ -63,6 +65,80 @@ def _release_metadata(
         if not value or any(character in value for character in "\r\n\0"):
             raise ValueError("{} must be a non-empty single line".format(field_name))
     return values["product_name"], values["product_version"], values["publisher"]
+
+
+def _resolve_license_evidence(
+    source: Path,
+    content_license_mode: str,
+    third_party_notices_relative_path: str,
+) -> Optional[Dict[str, object]]:
+    if content_license_mode not in CONTENT_LICENSE_MODES:
+        raise ValueError(
+            "content_license_mode must be one of: {}".format(
+                ", ".join(sorted(CONTENT_LICENSE_MODES))
+            )
+        )
+
+    raw_notices_path = third_party_notices_relative_path.strip()
+    if content_license_mode == "original_only":
+        if raw_notices_path:
+            raise ValueError(
+                "third_party_notices_relative_path requires third_party_notices mode"
+            )
+        return None
+
+    if not raw_notices_path:
+        raise ValueError(
+            "third_party_notices_relative_path is required for third_party_notices mode"
+        )
+    relative_path = Path(raw_notices_path)
+    if relative_path.is_absolute() or ".." in relative_path.parts:
+        raise ValueError("third_party_notices_relative_path must stay inside source_directory")
+    notices_path = (source / relative_path).resolve()
+    if source not in notices_path.parents:
+        raise ValueError("third_party_notices_relative_path must stay inside source_directory")
+    if notices_path.suffix.lower() not in {".md", ".txt"}:
+        raise ValueError("third-party notices must be a .md or .txt file")
+    if not notices_path.is_file():
+        raise FileNotFoundError("Third-party notices file not found under source_directory")
+    size = notices_path.stat().st_size
+    if size <= 0 or size > MAX_NOTICES_BYTES:
+        raise ValueError("third-party notices must be non-empty and no larger than 2 MiB")
+    return {
+        "relative_path": str(notices_path.relative_to(source)).replace("\\", "/"),
+        "bytes": size,
+        "sha256": _sha256(notices_path),
+    }
+
+
+def _write_license_provenance(
+    source: Path,
+    executable: Path,
+    output: Path,
+    product_name: str,
+    product_version: str,
+    content_license_mode: str,
+    third_party_notices: Optional[Dict[str, object]],
+) -> Path:
+    provenance = output / "license-provenance.json"
+    provenance.write_text(
+        json.dumps(
+            {
+                "schema": "dcc-mcp.game-release.license-provenance.v1",
+                "product_name": product_name,
+                "product_version": product_version,
+                "executable": str(executable.relative_to(source)).replace("\\", "/"),
+                "executable_sha256": _sha256(executable),
+                "content_license_mode": content_license_mode,
+                "third_party_notices": third_party_notices,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return provenance
 
 
 def _resolve_iscc(raw_path: str) -> Path:
@@ -371,6 +447,8 @@ def package_release(
     executable_relative_path: str,
     output_directory: str,
     release_profile: str,
+    content_license_mode: str = "",
+    third_party_notices_relative_path: str = "",
     product_name: str = "",
     product_version: str = "1.0.0",
     publisher: str = "",
@@ -387,6 +465,11 @@ def package_release(
     )
     resolved_name, resolved_version, resolved_publisher = _release_metadata(
         product_name, product_version, publisher, executable.stem
+    )
+    third_party_notices = _resolve_license_evidence(
+        source,
+        content_license_mode,
+        third_party_notices_relative_path,
     )
     output.mkdir(parents=True, exist_ok=True)
 
@@ -418,6 +501,17 @@ def package_release(
         )
         prompt = "Complete Rail SDK testing before authenticated WeGame portal submission."
 
+    license_provenance = _write_license_provenance(
+        source,
+        executable,
+        output,
+        resolved_name,
+        resolved_version,
+        content_license_mode,
+        third_party_notices,
+    )
+    artifacts.append(license_provenance)
+
     return {
         "prompt": prompt,
         "artifacts": [str(path) for path in artifacts],
@@ -425,4 +519,7 @@ def package_release(
         "source_directory": str(source),
         "game_executable_path": str(executable),
         "output_directory": str(output),
+        "content_license_mode": content_license_mode,
+        "third_party_notices": third_party_notices,
+        "license_provenance_path": str(license_provenance),
     }
