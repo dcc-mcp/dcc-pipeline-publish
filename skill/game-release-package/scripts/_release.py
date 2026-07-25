@@ -287,7 +287,7 @@ WizardStyle=modern
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional shortcuts:"
 
 [Files]
-Source: "{source}\\*"; DestDir: "{{app}}"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{source}\\*"; DestDir: "{{app}}"; Excludes: "*.pdb,*_BurstDebugInformation_DoNotShip\\*"; Flags: ignoreversion recursesubdirs
 {prerequisite_file}
 
 [Icons]

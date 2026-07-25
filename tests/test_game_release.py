@@ -132,3 +132,17 @@ def test_installer_script_supports_vc_redist(tmp_path):
     assert "vc_redist.x64.exe" in content
     assert 'Parameters: "/install /quiet /norestart"' in content
     assert installer.name == "Example-Game-Setup-2.1.0.exe"
+
+
+def test_installer_excludes_unity_burst_do_not_ship_directory(tmp_path):
+    source, executable = _game(tmp_path)
+    installer_dir = tmp_path / "release" / "Installer"
+    installer_dir.mkdir(parents=True)
+
+    script, _ = release._write_installer_script(
+        source, executable, installer_dir, "Example", "1.0.0", "Studio", None
+    )
+
+    content = script.read_text(encoding="utf-8-sig")
+    assert '*_BurstDebugInformation_DoNotShip\\*' in content
+    assert "createallsubdirs" not in content
