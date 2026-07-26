@@ -8,7 +8,7 @@ metadata:
     dcc: python
     layer: domain
     stage: pipeline
-    version: "0.2.0"
+    version: "0.2.1"
     tags: [game, release, package, installer, steam, wegame, unreal, unity, godot]
     search-hint: "package or distribute a built Unreal Unity or Godot game, create Windows installer, prepare SteamPipe or WeGame release"
     tools: tools.yaml
