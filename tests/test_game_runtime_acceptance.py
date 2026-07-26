@@ -51,17 +51,38 @@ def _successful_log(path):
 
 def test_evaluates_structured_milestones_metrics_and_hashes(tmp_path):
     log = tmp_path / "runtime.log"
-    executable = tmp_path / "Game.exe"
+    source = tmp_path / "build"
+    source.mkdir()
+    executable = source / "Game.exe"
     executable.write_bytes(b"game")
+    (source / "Game_Data").mkdir()
+    (source / "Game_Data" / "sharedassets0.assets").write_bytes(b"hero-data")
     _successful_log(log)
     report = acceptance.evaluate_log(
-        str(log), executable_path=str(executable), **_rules()
+        str(log),
+        executable_path=str(executable),
+        source_directory=str(source),
+        **_rules(),
     )
     assert report["passed"] is True
     assert report["event_counts"]["boss_spawned"] == 3
     assert report["metrics"][0]["observed_min"] == 60.3
     assert len(report["executable_sha256"]) == 64
+    assert len(report["source_manifest_sha256"]) == 64
+    assert report["source_file_count"] == 2
+    assert report["source_bytes"] == len(b"gamehero-data")
     assert len(report["log_sha256"]) == 64
+
+    first_manifest = report["source_manifest_sha256"]
+    (source / "Game_Data" / "sharedassets0.assets").write_bytes(b"new-hero-data")
+    changed = acceptance.evaluate_log(
+        str(log),
+        executable_path=str(executable),
+        source_directory=str(source),
+        **_rules(),
+    )
+    assert changed["executable_sha256"] == report["executable_sha256"]
+    assert changed["source_manifest_sha256"] != first_manifest
 
 
 def test_reports_forbidden_marker_and_metric_failure(tmp_path):
@@ -143,6 +164,9 @@ def test_launch_contract_uses_exact_executable_without_shell(tmp_path, monkeypat
     assert observed["command"] == [str((source / "Game.exe").resolve()), "--validation"]
     assert result["process_id"] == 4242
     assert result["process_running"] is True
+    assert result["report"]["source_file_count"] == 1
+    assert result["report"]["source_bytes"] == len(b"game")
+    assert len(result["report"]["source_manifest_sha256"]) == 64
 
 
 def test_acceptance_failure_terminates_the_exact_launched_process(tmp_path, monkeypatch):

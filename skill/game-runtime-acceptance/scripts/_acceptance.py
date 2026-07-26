@@ -39,6 +39,29 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _source_manifest(source: Path) -> Tuple[str, int, int]:
+    digest = hashlib.sha256()
+    file_count = 0
+    total_bytes = 0
+    for path in sorted(source.rglob("*"), key=lambda item: item.as_posix()):
+        if path.is_symlink():
+            raise ValueError("prebuilt game directory must not contain symbolic links")
+        if not path.is_file():
+            continue
+        relative = path.relative_to(source).as_posix().encode("utf-8")
+        size = path.stat().st_size
+        digest.update(relative)
+        digest.update(b"\0")
+        digest.update(str(size).encode("ascii"))
+        digest.update(b"\0")
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        file_count += 1
+        total_bytes += size
+    return digest.hexdigest(), file_count, total_bytes
+
+
 def _bounded_text(path: Path) -> Tuple[str, int]:
     size = path.stat().st_size
     if size > MAX_LOG_BYTES:
@@ -168,6 +191,7 @@ def evaluate_log(
     required_markers: Sequence[str],
     forbidden_markers: Sequence[str],
     executable_path: str = "",
+    source_directory: str = "",
 ) -> Dict[str, Any]:
     """Evaluate one bounded log without launching a process."""
     _validate_contract(
@@ -256,6 +280,17 @@ def evaluate_log(
             raise FileNotFoundError("game executable not found: {}".format(executable))
         report["executable_path"] = str(executable)
         report["executable_sha256"] = _sha256(executable)
+    if source_directory:
+        source = Path(source_directory).expanduser().resolve()
+        if not source.is_dir():
+            raise FileNotFoundError("prebuilt game directory not found: {}".format(source))
+        source_hash, file_count, source_bytes = _source_manifest(source)
+        report.update(
+            source_directory=str(source),
+            source_manifest_sha256=source_hash,
+            source_file_count=file_count,
+            source_bytes=source_bytes,
+        )
     return report
 
 
@@ -374,6 +409,13 @@ def run_acceptance(
     source, executable, request_directory = _resolve_launch_paths(
         source_directory, executable_relative_path, evidence_directory, request_id
     )
+    source_hash, source_file_count, source_bytes = _source_manifest(source)
+    source_evidence = {
+        "source_directory": str(source),
+        "source_manifest_sha256": source_hash,
+        "source_file_count": source_file_count,
+        "source_bytes": source_bytes,
+    }
     log_path = request_directory / "runtime.log"
     report_path = request_directory / "acceptance-report.json"
     command = _command(engine, executable, arguments, log_path)
@@ -425,6 +467,7 @@ def run_acceptance(
                         forbidden_markers,
                         str(executable),
                     )
+                    report.update(source_evidence)
                     report.update(
                         request_id=request_id,
                         engine=engine,
@@ -452,7 +495,7 @@ def run_acceptance(
                 if report is None and log_path.is_file():
                     report = evaluate_log(
                         str(log_path), event_prefix, completion_event, required_events,
-                        metrics, required_markers, forbidden_markers, str(executable)
+                        metrics, required_markers, forbidden_markers, str(executable),
                     )
                 if report is None:
                     report = {"schema": REPORT_SCHEMA, "passed": False, "failures": []}
@@ -461,6 +504,7 @@ def run_acceptance(
                 )
                 report.update(
                     passed=False,
+                    **source_evidence,
                     request_id=request_id,
                     engine=engine,
                     process_id=process.pid,
@@ -477,6 +521,7 @@ def run_acceptance(
                 )
                 report.update(
                     passed=False,
+                    **source_evidence,
                     request_id=request_id,
                     engine=engine,
                     process_id=process.pid,
