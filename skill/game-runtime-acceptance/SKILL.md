@@ -8,7 +8,7 @@ metadata:
     dcc: python
     layer: domain
     stage: validation
-    version: "0.1.0"
+    version: "0.1.1"
     tags: [game, runtime, acceptance, validation, evidence, unity, unreal, godot]
     search-hint: "launch or validate a built Unity Unreal or Godot game, verify runtime events performance victory bosses logs and evidence"
     tools: tools.yaml
