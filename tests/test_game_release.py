@@ -131,6 +131,7 @@ def test_installer_script_supports_vc_redist(tmp_path):
     content = script.read_text(encoding="utf-8-sig")
     assert "vc_redist.x64.exe" in content
     assert 'Parameters: "/install /quiet /norestart"' in content
+    assert "PrivilegesRequired=lowest" in content
     assert installer.name == "Example-Game-Setup-2.1.0.exe"
 
 
