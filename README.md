@@ -51,3 +51,14 @@ Gameplay capture remains separate from runtime acceptance and editing. See the
 [game PV capture workflow](skill/game-pv-capture/references/WORKFLOW.md) for
 multi-instance routing, exact-window recording, and frame evidence rules.
 
+## PyPI status: not published
+
+This repository is an **agent skill pack**, not a distributable Python package.
+It contains no importable module under `src/` — the deliverable is the set of
+markdown skill definitions under `skill/`, which agents load from the repository
+or the skill marketplace rather than via `pip install`.
+
+It is therefore intentionally **not published to PyPI**, and no release
+workflow exists for that purpose. Tracked in [PIP-3630][pip3630].
+
+[pip3630]: https://monica.woa.com/issues/01a0d880-e0c8-7ee2-8f7c-ccc783e279dc
