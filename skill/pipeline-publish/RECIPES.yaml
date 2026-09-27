@@ -1,0 +1,191 @@
+# Render-farm readiness recipe pack for the pipeline-publish skill (PIP-3710).
+#
+# One outcome-level recipe: a single sentence in, a machine-checkable scene
+# health report out. `scene_qa` never mutates the DCC scene — the report file
+# named by `report_path` is the only artifact it creates, and therefore the only
+# thing `undo` has to remove.
+#
+#   name             - canonical pipeline verb (snake_case); also the dispatch verb
+#   dcc: any         - host agnostic; steps resolve through `tool_routing`
+#   undo             - single-step | none | manual (P0-B enum, mirrored in SKILL.md)
+#   undo_steps       - the concrete rollback for `single-step`; when `undo` is
+#                      `none`/`manual`, `recovery[].next` must spell the same steps
+#   inputs_schema    - Draft 2020-12 input contract (validated by core)
+#   steps            - ordered dispatch plan over canonical `scene_qa__<verb>` tools
+#   output_contract  - Draft 2020-12 schema for the observed tool receipt
+#
+# `output_contract` is a schema, not a label: after the tool runs, the observed
+# result is validated against it. Contracts are only meaningful when they can
+# fail, so the contract requires the fields that prove the scan actually
+# happened — `checked_count`, `finding_count`, the `report_sha256` digest of the
+# written report, and the read-only proof `scene_changed: false`.
+#
+# Core returns the plan verbatim: it neither substitutes `${x}` placeholders nor
+# applies schema defaults. Every placeholder therefore names an input that is
+# required or carries a default — including placeholders inside `undo_steps`.
+# `examples/scene_qa/materialize_plan.py` materializes a plan before dispatch.
+#
+# Placeholders are quoted ("${x}") so YAML keeps them as strings.
+
+pack:
+  name: pipeline-publish
+  version: "0.3.0"
+  dcc: any
+  canonical_namespace: scene_qa
+  output_contract_format: draft-2020-12
+
+# Canonical verb -> the concrete tool each adapter publishes. A `null` entry
+# means the adapter publishes no equivalent: callers must fall back to that
+# adapter's scripting tool and project the result onto the output contract.
+#
+# This table resolves the *tool*, not the argument shape. Step arguments use the
+# canonical vocabulary declared in `inputs_schema`; mapping them onto an
+# adapter's own signature is that adapter's job. Where an adapter cannot express
+# a canonical argument at all, use the scripting fallback instead of dropping it
+# silently.
+tool_routing:
+  adapters: [blender, houdini, maya, "3dsmax"]
+  scripting_fallback:
+    blender: blender_scripting__execute_python
+    houdini: houdini_scripting__execute_python
+    maya: maya_scripting__execute_python
+    "3dsmax": 3dsmax_scripting__execute_python
+  tools:
+    scan_scene:
+      blender: blender_render_farm__validate_scene_for_farm
+      houdini: null
+      maya: null
+      "3dsmax": null
+    write_report:
+      blender: null
+      houdini: null
+      maya: null
+      "3dsmax": null
+
+recipes:
+  - name: scene_qa
+    dcc: any
+    description: >-
+      Read-only farm-readiness sweep of one scene — unsaved state, output path,
+      frame range, missing textures and linked libraries, naming and duplicate
+      names — written to a digest-backed JSON report.
+    side_effects:
+      modifies: false
+      creates: true
+      deletes: false
+      targets: [report_file]
+    undo: single-step
+    undo_steps:
+      - "Delete the report file at \"${report_path}\"; nothing else was touched."
+    examplePrompts:
+      - "Check whether this scene is ready for the render farm"
+      - "Can I submit this scene to the farm, or does it have missing textures?"
+      - "Give me a health report for this scene before I publish it"
+    recovery:
+      - when: "scan_scene resolves to null on this host (no adapter publishes a scene QA tool)"
+        next: >-
+          Dispatch the host scripting fallback tool named in
+          tool_routing.scripting_fallback with a read-only scan script, then project
+          the observed result onto output_contract before calling write_report.
+      - when: "write_report fails after the report file was partially written"
+        next: >-
+          Delete the partial file at report_path, confirm the directory is writable,
+          then re-run scene_qa with the same inputs.
+      - when: "the report was produced but the farm still rejected the scene"
+        next: >-
+          Delete the file at report_path, fix the blocking findings listed in the
+          report findings array, then re-run scene_qa with the same inputs.
+    inputs_schema:
+      type: object
+      additionalProperties: false
+      required: [scene_path, report_path]
+      properties:
+        scene_path:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        report_path:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        checks:
+          type: array
+          minItems: 1
+          maxItems: 8
+          uniqueItems: true
+          items:
+            type: string
+            enum: [unsaved, camera, frame_range, output_path, missing_textures, libraries, naming, duplicate_names]
+          default: [unsaved, camera, frame_range, output_path, missing_textures, libraries, naming, duplicate_names]
+        fail_on:
+          type: string
+          enum: [error, warning]
+          default: error
+        overwrite:
+          type: boolean
+          default: false
+    steps:
+      - tool: scene_qa__scan_scene
+        arguments:
+          scene_path: "${scene_path}"
+          checks: "${checks}"
+      - tool: scene_qa__write_report
+        arguments:
+          scene_path: "${scene_path}"
+          report_path: "${report_path}"
+          checks: "${checks}"
+          fail_on: "${fail_on}"
+          overwrite: "${overwrite}"
+    output_contract:
+      type: object
+      required:
+        - scene_path
+        - report_path
+        - checked_count
+        - finding_count
+        - blocking_finding_count
+        - report_sha256
+        - passed
+        - scene_changed
+      properties:
+        scene_path:
+          type: string
+          minLength: 1
+        report_path:
+          type: string
+          minLength: 1
+        checked_count:
+          type: integer
+          minimum: 1
+          maximum: 8
+        finding_count:
+          type: integer
+          minimum: 0
+        blocking_finding_count:
+          type: integer
+          minimum: 0
+          maximum: 4096
+        report_sha256:
+          type: string
+          pattern: "^[0-9a-f]{64}$"
+        passed:
+          type: boolean
+        scene_changed:
+          type: boolean
+          const: false
+        findings:
+          type: array
+          items:
+            type: object
+            required: [code, severity, message]
+            properties:
+              code:
+                type: string
+                enum: [unsaved, camera, frame_range, output_path, missing_textures, libraries, naming, duplicate_names]
+              severity:
+                type: string
+                enum: [error, warning]
+              message:
+                type: string
+                minLength: 1
+    toolset_profiles: [pipeline-publish]
