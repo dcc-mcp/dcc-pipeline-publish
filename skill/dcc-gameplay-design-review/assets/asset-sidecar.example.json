@@ -1,0 +1,32 @@
+{
+  "schema": "dcc-gameplay-asset-sidecar/draft-1",
+  "example_only": true,
+  "asset_id": "original-rts-watchtower",
+  "version": "0.0.0-example",
+  "visibility": "private",
+  "files": [{"role": "source", "path": null, "sha256": null}],
+  "provenance": {
+    "author": null, "provider": null, "model_version": null,
+    "generated_at": null, "input_rights": "unknown",
+    "terms_url": null, "terms_evidence": null,
+    "cost": {"amount": null, "currency": null}
+  },
+  "rights": {
+    "license": "unknown", "commercial_use": "unknown",
+    "redistribution": "unknown", "credits": [], "reviewed_at": null
+  },
+  "technical": {
+    "uv": "not-tested", "pbr": "not-tested", "rig": "not-tested",
+    "actions": [], "scale_units": null, "up_axis": null,
+    "lods": [], "collision": "not-tested"
+  },
+  "dependencies": [],
+  "derived_from": null,
+  "preview": {"path": null, "sha256": null, "rights": "unknown"},
+  "import_validation": {
+    "status": "not-tested", "engine_version": null,
+    "asset_sha256": null, "evidence": []
+  },
+  "project_lock": null,
+  "publish_manifest": null
+}
