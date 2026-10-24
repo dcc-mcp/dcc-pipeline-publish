@@ -2,8 +2,11 @@
 
 Portable release and publish skills for DCC-MCP production workflows.
 
-The repository currently owns four engine-neutral contracts:
+The repository currently owns five engine-neutral contracts:
 
+- `dcc-gameplay-design-review` prepares a bounded gameplay and numerical review
+  with explicit evidence limits and optional private asset sidecars. It is a
+  local instruction-only slice, not yet registered in the marketplace.
 - `pipeline-publish` records verified DCC exports for downstream production systems.
 - `game-release-package` turns an already exported Windows game into an installer,
   SteamPipe preview configuration, or WeGame submission preflight.
