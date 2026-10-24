@@ -38,7 +38,10 @@ generate/configure credentials, or pay fees. Those are separate authorized
 steps. Never put secrets into a command example or report. A platform preview
 command may transmit the build; check its semantics before proposing it.
 
-Reuse `pipeline-publish` for file hash manifests when available. Existing
+Reuse `pipeline-publish` for per-file hash evidence for explicitly supplied files when
+available; it does not discover a complete browser package inventory. Enumerate
+all package members separately and report package-relative paths rather than
+exposing its resolved absolute paths. Existing
 `game-release-package` owns Windows distribution; `game-runtime-acceptance`
 and `game-pv-capture` currently declare Windows-build support. Browser testing
 needs its own evidence and is not satisfied by those Windows results. Keep

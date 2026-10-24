@@ -5,7 +5,7 @@ This is a technical preparation guide, not a legal eligibility determination.
 
 | Route | Actual artifact and automation | Account/cost/review boundary |
 | --- | --- | --- |
-| itch.io HTML5 | Complete browser export with index.html; Web ZIP or single HTML. Butler supports incremental uploads after setup. | Officially free upload/hosting; account/project and visibility choices still needed. Commercial payments have separate terms/fees. Content/quality rules still apply; uploading does not guarantee discovery. |
+| itch.io HTML5 | Complete browser export: ZIP with index.html at its root, or a standalone self-contained HTML file. Butler supports incremental uploads; after the first push, the owner must set the page to HTML and mark the channel as HTML5 / playable in browser. | Officially free upload/hosting; account/project and visibility choices still needed. Commercial payments have separate terms/fees. Content/quality rules still apply; uploading does not guarantee discovery. |
 | WeChat mini game | Actual supported mini-game build, not arbitrary HTML5. Official miniprogram-ci handles compilation, preview, and upload. | AppID and administrator-provisioned upload key/IP allowlist are prerequisites. Upload is not approval or publication. Current account-specific qualification, verification fees, privacy obligations, and package limits remain to be verified. |
 | Douyin mini game | Dedicated mini-game project. Official tt-minigame-ide-cli exposes developer-tool commands including upload-backed preview. | Official onboarding requires subject verification before game creation. Submission/review/publication follow upload. Account-specific fees and qualifications must be checked; no blanket zero-cost claim. |
 

@@ -7,7 +7,8 @@ only when packaging is requested. Inventory relative paths, sizes, and hashes;
 flag symlinks, private files, credentials, unexpected sources, and missing
 notices before any future upload. Do not silently strip files from the original.
 
-For itch.io, index.html must be in the archive's served root. Local references
+For itch.io ZIP uploads, index.html must be in the archive's served root.
+A standalone self-contained HTML upload does not require that filename. Local references
 must have exact case and resolve relative to the project; leading-slash paths
 can break when hosted under a subdirectory. Inventory external domains and
 mixed-content URLs. Static reference checks cannot resolve all dynamically
@@ -85,15 +86,23 @@ The account owner can start from itch.io's official HTML5 upload guide below
 and select their intended existing project. Have the reviewed ZIP/build hash,
 listing materials and notices ready. This needs the owner because project
 access and audience choices are not yet verified. If uploading is authorized,
-upload only that build and keep the verified private/draft visibility;
+upload only that build after verifying Draft visibility and who has access;
 do not make the page public as part of the upload. Verify the current controls
 rather than assuming a button sequence. Report only the nonsensitive project
 URL and uploaded build/version status. I can then verify preview loading,
 input and save behavior within the authorized access, before asking separately
 about a public release."
 
-Do not treat Public restricted or an unlisted URL as private: verify who can
-view the page and download the build.
+Verify itch.io's current visibility modes: Draft, Restricted, and Public.
+Draft access can include editors and secret-link holders; Restricted access
+can include approved viewers. Public with Unlisted in search & browse is still
+public, and disabling new downloads does not hide the page. Verify page access
+and file access separately. Do not request access secrets as evidence.
+
+An upload to an already-public project/channel may make the build immediately
+available. Upload and publication are distinct states, but can coincide on that
+destination; verify visibility before any separately authorized upload, rather
+than assuming every upload is staged or private.
 
 If the user cannot access the official project or the expected visibility
 control is absent, stop the upload step and help identify the account/capability
@@ -105,4 +114,5 @@ Sources checked 2026-10-24:
 - https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_web.html
 - https://itch.io/docs/creators/quality-guidelines
 
-- https://itch.io/docs/creators/getting-started
+- https://itch.io/docs/creators/access-control
+- https://itch.io/docs/butler/pushing.html
