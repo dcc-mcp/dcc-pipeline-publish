@@ -3,11 +3,29 @@
   "example_only": true,
   "target": "itch-html5",
   "visibility": "private",
-  "artifact": {"engine": null, "version": null, "export_settings": {}, "files": []},
-  "package_checks": {"status": "not-tested", "evidence": []},
-  "browser_checks": {"status": "not-tested", "devices": [], "evidence": []},
-  "storage_checks": {"status": "not-tested", "evidence": []},
-  "touch_checks": {"status": "not-tested", "evidence": []},
+  "artifact": {
+    "engine": null,
+    "version": null,
+    "export_settings": {},
+    "files": []
+  },
+  "package_checks": {
+    "status": "not-tested",
+    "evidence": []
+  },
+  "browser_checks": {
+    "status": "not-tested",
+    "devices": [],
+    "evidence": []
+  },
+  "storage_checks": {
+    "status": "not-tested",
+    "evidence": []
+  },
+  "touch_checks": {
+    "status": "not-tested",
+    "evidence": []
+  },
   "rights_review": "unknown",
   "privacy_review": "unknown",
   "account_prerequisites": "not-verified",
@@ -15,5 +33,24 @@
   "upload_authorized": false,
   "uploaded": false,
   "review_submitted": false,
-  "published": false
+  "published": false,
+  "manual_handoff": {
+    "current_state": "local-preparation",
+    "official_entry": "https://itch.io/docs/creators/html5",
+    "operator": "account-owner",
+    "manual_reason": "Project access and audience are not verified",
+    "material_categories": [
+      "reviewed-build",
+      "listing-materials",
+      "license-notices",
+      "privacy-disclosures"
+    ],
+    "next_action": "Review project access and intended visibility; do not upload yet",
+    "completion_evidence": [
+      "nonsensitive-project-url",
+      "status-label"
+    ],
+    "resume_step": "Verify authorized project state before requesting a bounded upload",
+    "sensitive_materials_destination": "verified-official-platform-only"
+  }
 }

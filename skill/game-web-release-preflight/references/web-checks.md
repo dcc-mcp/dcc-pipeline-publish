@@ -55,7 +55,54 @@ the target account/project, exact artifact/version, audience/visibility, and
 purpose. Separate upload, preview, review submission, and publication states.
 A valid archive is not evidence of successful publication or store acceptance.
 
+## Actionable manual handoff
+
+When automation is unavailable or not authorized, provide a concise handoff:
+- Current state: local preparation, preview, uploaded, review submitted, or live.
+  State which are verified; a platform preview can already involve uploading.
+- Official entry: verified documentation or the exact authorized project page.
+  Do not invent dashboard URLs, button labels, or an unobserved UI sequence.
+- Operator: the account owner or an existing authorized role, not an invented
+  administrator. Explain why this step needs them (identity, agreement, payment,
+  access, review choice, or unavailable capability).
+- Materials: categories and the exact approved build/version, listing copy,
+  screenshots, license notices, and privacy disclosures needed. Enter identity
+  documents, tax details, signing keys and credentials only on the verified
+  official platform or approved secure flow, never back in chat or a repository.
+- Smallest step: one bounded action and intended audience, separating upload,
+  review submission and public release; do not imply authorization for all three.
+- Completion evidence: a nonsensitive status label, build/version ID, or shareable
+  project URL. If a screenshot is necessary, ask to redact private information.
+  Never ask for a secret or identity-document image to establish completion.
+- Resume: name the next read-only verification or preparation step. A reported
+  upload is not proof of live availability; check the actual state when access
+  is authorized. Never promise review approval or a guaranteed release date.
+
+Example: itch.io handoff after local package checks
+
+"The local HTML5 package is prepared; nothing has been uploaded or published.
+The account owner can start from itch.io's official HTML5 upload guide below
+and select their intended existing project. Have the reviewed ZIP/build hash,
+listing materials and notices ready. This needs the owner because project
+access and audience choices are not yet verified. If uploading is authorized,
+upload only that build and keep the verified private/draft visibility;
+do not make the page public as part of the upload. Verify the current controls
+rather than assuming a button sequence. Report only the nonsensitive project
+URL and uploaded build/version status. I can then verify preview loading,
+input and save behavior within the authorized access, before asking separately
+about a public release."
+
+Do not treat Public restricted or an unlisted URL as private: verify who can
+view the page and download the build.
+
+If the user cannot access the official project or the expected visibility
+control is absent, stop the upload step and help identify the account/capability
+gap without switching projects or publishing as a workaround. Other stores
+need their own official process; do not apply itch.io steps to Steam or mobile.
+
 Sources checked 2026-10-24:
 - https://itch.io/docs/creators/html5
 - https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_web.html
 - https://itch.io/docs/creators/quality-guidelines
+
+- https://itch.io/docs/creators/getting-started

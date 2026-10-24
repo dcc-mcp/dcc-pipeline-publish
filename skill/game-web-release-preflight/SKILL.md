@@ -27,7 +27,9 @@ verification. Do not rename HTML files or add game.json to pretend conversion.
 
 Produce a short report: package findings, browser/input/storage evidence,
 asset-license and privacy questions, account/review prerequisites, known costs
-and unknown fees, and the next explicitly bounded action. Missing evidence
+and unknown fees, and the next explicitly bounded action. When a step needs a person, provide
+the actionable handoff template in Web checks instead of only saying blocked.
+Missing evidence
 means not tested, not passed. Avoid turning this guidance into a runtime gate.
 
 This skill is preparation only. Do not upload even a private preview, submit

@@ -43,6 +43,13 @@ class WebReleasePreflightTests(unittest.TestCase):
         self.assertEqual(data["browser_checks"]["devices"], [])
         self.assertEqual(data["account_prerequisites"], "not-verified")
         self.assertEqual(data["cost_review"], "not-verified")
+        handoff = data["manual_handoff"]
+        self.assertEqual(handoff["current_state"], "local-preparation")
+        self.assertEqual(handoff["sensitive_materials_destination"],
+                         "verified-official-platform-only")
+        for key in ("official_entry", "operator", "manual_reason", "material_categories",
+                    "next_action", "completion_evidence", "resume_step"):
+            self.assertTrue(handoff[key], key)
         self.assertEqual(data["rights_review"], "unknown")
         self.assertEqual(data["privacy_review"], "unknown")
 
