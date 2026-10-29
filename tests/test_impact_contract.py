@@ -70,6 +70,11 @@ class ImpactContractTests(unittest.TestCase):
             event = copy.deepcopy(EXAMPLE['event']); event[key] = value
             with self.subTest(key=key), self.assertRaises((ValidationError, ValueError)):
                 validate('hit-event', event)
+        for result in ('blocked', 'immune'):
+            event = copy.deepcopy(EXAMPLE['event'])
+            event.update(result=result, damage_applied=0, fatal=True)
+            with self.subTest(result=result), self.assertRaises(ValidationError):
+                validate('hit-event', event)
         profile = copy.deepcopy(EXAMPLE['profiles'][0]); profile['scope'] = 'presentation_only'
         with self.assertRaises(ValidationError): validate('impact-profile', profile)
         profile['simulation_hitstop_seconds'] = 0
@@ -78,6 +83,12 @@ class ImpactContractTests(unittest.TestCase):
     def test_unknown_unreviewed_asset_and_global_scope_rejected(self):
         profile = copy.deepcopy(EXAMPLE['profiles'][0])
         profile['assets'] = [{'asset_id': 'unknown'}]
+        with self.assertRaises(ValidationError): validate('impact-profile', profile)
+        profile['assets'] = [{
+            'asset_id': 'synthetic-only', 'source_url': 'https://example.invalid/asset',
+            'version': 'fixture-1', 'sha256': '0' * 64,
+            'license_evidence': 'synthetic fixture, no actual rights claim',
+            'redistribution': 'reference_only', 'review_status': 'unreviewed'}]
         with self.assertRaises(ValidationError): validate('impact-profile', profile)
         profile['assets'] = []; profile['scope'] = 'global'
         with self.assertRaises(ValidationError): validate('impact-profile', profile)

@@ -24,7 +24,10 @@ def validate_fixture(value):
 def changed_paths(before, after, prefix=()):
     if isinstance(before, dict) and isinstance(after, dict):
         result = []
-        for key in sorted(before.keys() | after.keys()):
+        keys = before.keys() | after.keys()
+        if not prefix:
+            keys -= {"trial_id", "config_digest", "verification"}
+        for key in sorted(keys):
             if key not in before or key not in after:
                 result.append(prefix + (key,))
             else:
@@ -64,6 +67,20 @@ class GameFeelContractTests(unittest.TestCase):
         variant["response"]["enabled"] = True
         self.assertEqual(len(changed_paths(baseline, variant)), 2,
                          "two changes cannot be reported as single-variable A/B")
+
+    def test_comparison_ignores_only_top_level_trial_evidence(self):
+        before = {"trial_id": "a", "config_digest": None,
+                  "verification": {"notes": "fixture-a"},
+                  "response": {"enabled": False}}
+        after = copy.deepcopy(before)
+        after.update(trial_id="b", config_digest="synthetic-digest",
+                     verification={"notes": "fixture-b"})
+        after["response"]["enabled"] = True
+        self.assertEqual(changed_paths(before, after), [("response", "enabled")])
+        # Do not hide future gameplay fields merely because their name matches
+        # a top-level metadata key.
+        after["response"]["verification"] = "nested-change"
+        self.assertIn(("response", "verification"), changed_paths(before, after))
 
     def test_hitstop_has_separate_owners_in_all_four_combinations(self):
         for rhythm in (False, True):
