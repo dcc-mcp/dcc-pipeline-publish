@@ -3,7 +3,7 @@ name: dcc-gameplay-design-review
 description: Review a game's core loop, mechanics, numerical assumptions, and asset dependencies into a bounded implementation and playtest brief. Use before or between playable iterations, not for engine operation, runtime acceptance, video capture, or publishing.
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # Gameplay Design Review
