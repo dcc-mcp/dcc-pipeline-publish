@@ -1,0 +1,289 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Four-switch design example (not a production runtime configuration)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "example_only",
+    "baseline_id",
+    "baseline_digest",
+    "trial_id",
+    "config_digest",
+    "response",
+    "rhythm",
+    "feedback",
+    "forgiveness",
+    "clock_policy",
+    "switch_policy",
+    "accessibility_overrides",
+    "verification"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "game-feel-four-switches/v1"
+    },
+    "example_only": {
+      "const": true
+    },
+    "baseline_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "baseline_digest": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "trial_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "config_digest": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "parameters"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "dispatch",
+            "deadzone_normalized"
+          ],
+          "properties": {
+            "dispatch": {
+              "enum": [
+                "next_input_tick",
+                "next_simulation_tick"
+              ]
+            },
+            "deadzone_normalized": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        }
+      }
+    },
+    "rhythm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "parameters"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "startup_seconds",
+            "active_seconds",
+            "recovery_seconds",
+            "combo_open_seconds",
+            "combo_close_seconds",
+            "simulation_hitstop_seconds"
+          ],
+          "properties": {
+            "startup_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "active_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "recovery_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "combo_open_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "combo_close_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "simulation_hitstop_seconds": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "feedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "parameters"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "presentation_freeze_seconds",
+            "audio_intensity",
+            "vfx_intensity",
+            "shake_intensity",
+            "flash_intensity"
+          ],
+          "properties": {
+            "presentation_freeze_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "audio_intensity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "vfx_intensity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "shake_intensity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "flash_intensity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        }
+      }
+    },
+    "forgiveness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "parameters"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "input_buffer_seconds",
+            "grace_seconds",
+            "combo_extension_seconds"
+          ],
+          "properties": {
+            "input_buffer_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "grace_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "combo_extension_seconds": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "clock_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "presentation_freeze",
+        "input_expiry"
+      ],
+      "properties": {
+        "action": {
+          "const": "simulation"
+        },
+        "presentation_freeze": {
+          "const": "presentation"
+        },
+        "input_expiry": {
+          "enum": [
+            "input_real",
+            "simulation"
+          ]
+        }
+      }
+    },
+    "switch_policy": {
+      "const": "reset_boundary"
+    },
+    "accessibility_overrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "disable_flash",
+        "disable_shake"
+      ],
+      "properties": {
+        "disable_flash": {
+          "type": "boolean"
+        },
+        "disable_shake": {
+          "type": "boolean"
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "godot_native",
+        "unity_native",
+        "unreal_native",
+        "human_playtest"
+      ],
+      "properties": {
+        "godot_native": {
+          "const": "not_run"
+        },
+        "unity_native": {
+          "const": "not_run"
+        },
+        "unreal_native": {
+          "const": "not_run"
+        },
+        "human_playtest": {
+          "const": "not_run"
+        }
+      }
+    }
+  }
+}

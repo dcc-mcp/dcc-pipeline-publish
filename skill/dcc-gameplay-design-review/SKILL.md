@@ -15,7 +15,11 @@ do not replace a working vertical slice with a new framework or exhaustive GDD.
 
 Read [the gameplay contract](references/gameplay-contract.md) when specifying
 rules or numerical changes. Read [evidence and assets](references/evidence-and-assets.md)
-when evaluating results, selecting resources, or preparing a handoff. Record
+when evaluating results, selecting resources, or preparing a handoff. For response, rhythm, feedback, or forgiveness tuning, read
+[the four-switch contract](references/game-feel-four-switches.md). Its data
+fixtures are not a runtime implementation or native playtest result. For hit
+events, impact profiles and safe hitstop recovery, read
+[the impact contract](references/impact-contract.md). Record
 assumptions separately from user decisions and measured findings. Infer
 reversible defaults; ask only when a missing answer changes scope or authority.
 
