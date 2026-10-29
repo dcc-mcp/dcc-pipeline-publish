@@ -40,6 +40,9 @@ class GameplayDesignReviewTests(unittest.TestCase):
         self.assertTrue(all(isinstance(k, str) and isinstance(v, str)
                             for k, v in data.get("metadata", {}).items()))
 
+    def test_skill_root_preserves_license_for_selected_root_distribution(self):
+        self.assertEqual((SKILL / "LICENSE").read_bytes(), (ROOT / "LICENSE").read_bytes())
+
     def test_references_resolve_inside_skill(self):
         links = re.findall(r"\]\(([^)]+)\)", (SKILL / "SKILL.md").read_text())
         self.assertTrue(links)

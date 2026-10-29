@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "attack_instance_id",
+    "hit_index",
+    "world_instance_id",
+    "incarnation",
+    "attacker_id",
+    "target_id",
+    "target_generation",
+    "authority_tick",
+    "position",
+    "direction",
+    "coordinate_space",
+    "damage_applied",
+    "attack_type",
+    "result",
+    "fatal",
+    "authority",
+    "profile_id",
+    "profile_version",
+    "profile_digest"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "hit-event/v1"
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attack_instance_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hit_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "world_instance_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "incarnation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attacker_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_generation": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "authority_tick": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "position": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "number"
+      }
+    },
+    "direction": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "number"
+      },
+      "not": {
+        "const": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "coordinate_space": {
+      "const": "world"
+    },
+    "damage_applied": {
+      "type": "number",
+      "minimum": 0
+    },
+    "attack_type": {
+      "enum": [
+        "light_melee",
+        "heavy_melee",
+        "ranged"
+      ]
+    },
+    "result": {
+      "enum": [
+        "hit",
+        "blocked",
+        "immune"
+      ]
+    },
+    "fatal": {
+      "type": "boolean"
+    },
+    "authority": {
+      "const": "confirmed"
+    },
+    "profile_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "enum": [
+              "blocked",
+              "immune"
+            ]
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "then": {
+        "properties": {
+          "damage_applied": {
+            "const": 0
+          },
+          "fatal": {
+            "const": false
+          }
+        }
+      }
+    }
+  ]
+}
