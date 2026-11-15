@@ -1,8 +1,42 @@
 # dcc-pipeline-publish
 
-<p align="center">
-  <img src="docs/assets/dcc-pipeline-publish.svg" alt="DCC-MCP · PIPELINE-PUBLISH" width="600">
-</p>
+Portable release and publish skills for DCC-MCP production workflows.
+
+The repository currently owns six engine-neutral contracts:
+
+- `dcc-gameplay-design-review` prepares a bounded gameplay and numerical review
+  with explicit evidence limits and optional private asset sidecars. It is a
+  local instruction-only slice, not yet registered in the marketplace.
+- `game-web-release-preflight` prepares a local browser-release handoff and
+  distinguishes Web from mini-game platform exports. This experimental guidance
+  is not marketplace-registered and does not upload or publish anything.
+- `pipeline-publish` records verified DCC exports for downstream production systems.
+- `game-release-package` turns an already exported Windows game into an installer,
+  SteamPipe preview configuration, or WeGame submission preflight.
+- `game-runtime-acceptance` launches or validates a prebuilt game against
+  structured milestones, performance thresholds, and hash-bearing evidence.
+- `game-pv-capture` plans and preserves exact-window, hash-verified gameplay
+  shots before HyperFrames editing.
+
+![DCC exports validated, rendered on a farm, and recorded as published versions](docs/images/dcc-pipeline-publish-showcase.webp)
+
+## Why a manifest
+
+The skill does not reimplement ShotGrid, OpenUSD, or Deadline. It records the
+immutable files, hashes, entity identity, version, and optional farm job in one
+JSON handoff that existing adapters can consume.
+
+```mermaid
+flowchart LR
+    D[DCC export] --> P[Publish manifest]
+    P --> U[OpenUSD validation]
+    P --> R[Deadline or Flamenco]
+    U --> S[ShotGrid PublishedFile]
+    R --> V[ShotGrid Version]
+```
+
+See [`references/WORKFLOW.md`](skill/pipeline-publish/references/WORKFLOW.md)
+for the agent orchestration recipe.
 
 ## Agent workflow
 
@@ -47,27 +81,33 @@ query `dcc-mcp-cli stats --range 24h --session-id <task-id>` and pass only
 bounded evidence to the `review_skill_improvement` prompt from
 `dcc-mcp-skills-creator`.
 
+## Game releases
 
-A small, portable publish-manifest contract connecting DCC exports, OpenUSD
-validation, render-farm jobs, and Autodesk Flow Production Tracking.
+Game engines remain responsible for building playable content. After Unreal,
+Unity, or Godot exports a complete Windows directory, `game-release-package`
+handles the distribution-specific handoff without importing an engine SDK. It
+also requires an explicit original-only or third-party-notices declaration and
+emits hash-bound license provenance for the handoff.
 
-![DCC exports validated, rendered on a farm, and recorded as published versions](docs/images/dcc-pipeline-publish-showcase.webp)
+See the [game release workflow](skill/game-release-package/references/WORKFLOW.md)
+for prerequisites, profile behavior, and safety boundaries.
 
-## Why a manifest
+Runtime acceptance remains a separate gate. See the
+[game runtime workflow](skill/game-runtime-acceptance/references/WORKFLOW.md) for
+bounded launch behavior, structured event rules, and evidence ownership.
 
-The skill does not reimplement ShotGrid, OpenUSD, or Deadline. It records the
-immutable files, hashes, entity identity, version, and optional farm job in one
-JSON handoff that existing adapters can consume.
+Gameplay capture remains separate from runtime acceptance and editing. See the
+[game PV capture workflow](skill/game-pv-capture/references/WORKFLOW.md) for
+multi-instance routing, exact-window recording, and frame evidence rules.
 
-```mermaid
-flowchart LR
-    D[DCC export] --> P[Publish manifest]
-    P --> U[OpenUSD validation]
-    P --> R[Deadline or Flamenco]
-    U --> S[ShotGrid PublishedFile]
-    R --> V[ShotGrid Version]
-```
+## PyPI status: not published
 
-See [`references/WORKFLOW.md`](skill/pipeline-publish/references/WORKFLOW.md)
-for the agent orchestration recipe.
+This repository is an **agent skill pack**, not a distributable Python package.
+It contains no importable module under `src/` — the deliverable is the set of
+markdown skill definitions under `skill/`, which agents load from the repository
+or the skill marketplace rather than via `pip install`.
 
+It is therefore intentionally **not published to PyPI**, and no release
+workflow exists for that purpose. Tracked in [PIP-3630][pip3630].
+
+[pip3630]: https://monica.woa.com/issues/01a0d880-e0c8-7ee2-8f7c-ccc783e279dc

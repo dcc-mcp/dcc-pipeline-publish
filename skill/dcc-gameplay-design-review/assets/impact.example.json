@@ -1,0 +1,89 @@
+{
+  "example_only": true,
+  "native_status": {
+    "godot": "not_run",
+    "unity": "not_run",
+    "unreal": "not_run"
+  },
+  "profiles": [
+    {
+      "schema_version": "impact-profile/v1",
+      "profile_id": "light_melee",
+      "version": "0.1.0",
+      "reference_fps": 60,
+      "simulation_hitstop_seconds": 0.016666666666666666,
+      "presentation_freeze_seconds": 0,
+      "requested_scale": 0,
+      "scope": "local_actor",
+      "expiry_clock": "unscaled",
+      "overlap_policy": "strongest_active",
+      "max_continuous_seconds": 0.2,
+      "camera_seconds": 0.05,
+      "camera_intensity": 0.2,
+      "assets": []
+    },
+    {
+      "schema_version": "impact-profile/v1",
+      "profile_id": "heavy_melee",
+      "version": "0.1.0",
+      "reference_fps": 60,
+      "simulation_hitstop_seconds": 0.1,
+      "presentation_freeze_seconds": 0,
+      "requested_scale": 0,
+      "scope": "local_actor",
+      "expiry_clock": "unscaled",
+      "overlap_policy": "strongest_active",
+      "max_continuous_seconds": 0.2,
+      "camera_seconds": 0.2,
+      "camera_intensity": 0.5,
+      "assets": []
+    },
+    {
+      "schema_version": "impact-profile/v1",
+      "profile_id": "ranged",
+      "version": "0.1.0",
+      "reference_fps": 60,
+      "simulation_hitstop_seconds": 0.03333333333333333,
+      "presentation_freeze_seconds": 0,
+      "requested_scale": 0,
+      "scope": "local_actor",
+      "expiry_clock": "unscaled",
+      "overlap_policy": "strongest_active",
+      "max_continuous_seconds": 0.2,
+      "camera_seconds": 0.05,
+      "camera_intensity": 0.1,
+      "assets": []
+    }
+  ],
+  "event": {
+    "schema_version": "hit-event/v1",
+    "event_id": "example-hit-1",
+    "attack_instance_id": "example-attack-1",
+    "hit_index": 0,
+    "world_instance_id": "example-world",
+    "incarnation": "example-session-1",
+    "attacker_id": "player",
+    "target_id": "dummy",
+    "target_generation": 1,
+    "authority_tick": 100,
+    "position": [
+      0,
+      0,
+      0
+    ],
+    "direction": [
+      1,
+      0,
+      0
+    ],
+    "coordinate_space": "world",
+    "damage_applied": 1,
+    "attack_type": "light_melee",
+    "result": "hit",
+    "fatal": false,
+    "authority": "confirmed",
+    "profile_id": "light_melee",
+    "profile_version": "0.1.0",
+    "profile_digest": "sha256:e726d5f700015580bb562eb8bd9e13f04f45e5aa594e3a81a8c27f2f0375b95a"
+  }
+}

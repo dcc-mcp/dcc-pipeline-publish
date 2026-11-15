@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile_id",
+    "version",
+    "reference_fps",
+    "simulation_hitstop_seconds",
+    "presentation_freeze_seconds",
+    "requested_scale",
+    "scope",
+    "expiry_clock",
+    "overlap_policy",
+    "max_continuous_seconds",
+    "camera_seconds",
+    "camera_intensity",
+    "assets"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "impact-profile/v1"
+    },
+    "profile_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "const": "0.1.0"
+    },
+    "reference_fps": {
+      "const": 60
+    },
+    "simulation_hitstop_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "presentation_freeze_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "requested_scale": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "scope": {
+      "enum": [
+        "local_actor",
+        "presentation_only"
+      ]
+    },
+    "expiry_clock": {
+      "const": "unscaled"
+    },
+    "overlap_policy": {
+      "const": "strongest_active"
+    },
+    "max_continuous_seconds": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "camera_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "camera_intensity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "asset_id",
+          "source_url",
+          "version",
+          "sha256",
+          "license_evidence",
+          "redistribution",
+          "review_status"
+        ],
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_url": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "license_evidence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "redistribution": {
+            "enum": [
+              "allowed",
+              "reference_only"
+            ]
+          },
+          "review_status": {
+            "const": "reviewed_data_only"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "scope": {
+            "const": "presentation_only"
+          }
+        },
+        "required": [
+          "scope"
+        ]
+      },
+      "then": {
+        "properties": {
+          "simulation_hitstop_seconds": {
+            "const": 0
+          }
+        }
+      }
+    }
+  ]
+}
